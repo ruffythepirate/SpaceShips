@@ -11,10 +11,7 @@ package spaceships.logic;
 public class Astroid extends MovingObject {
 
     public Astroid(int numberOfCorners, float radius) {
-        //Allocates the rotation matrix.
-        rotationMatrix = new float[2][];
-        rotationMatrix[0] = new float[2];
-        rotationMatrix[1] = new float[2];
+        super();
 
         initializeOriginalShape(numberOfCorners, radius);
 

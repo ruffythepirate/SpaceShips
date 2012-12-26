@@ -127,6 +127,10 @@ public class SpaceShips implements Runnable {
                     break;
                 case 103:
                     break;
+                //Fire a bullet.
+                case 110:
+                    //spaceShip.createBullet();
+                    break;
             }
         }
     }

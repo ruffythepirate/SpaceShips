@@ -13,20 +13,54 @@ import java.awt.Graphics;
  */
 public abstract class MovingObject implements IGraphicItem, IPhysicalItem {
 
+    /**
+     * The angle that the shape is currently rotated to.
+     */
     protected double turnAngle;
+    /**
+     * The speed with which the turn angle is updating.
+     */
     protected double rotationSpeed;
+    /**
+     * The coordinates for the body.
+     */
     protected float x, y;
-    protected float dx, dy;
+    /**
+     * The speed that the body is currently moving at.
+     */
     protected float speed;
+    /**
+     * The speed of the current object in direction x and y.
+     */
     protected float directionX, directionY;
+    
     //Graphics
+    /**
+     * The color that the shape is rendered in.
+     */
     protected Color spaceShipColor = Color.WHITE;
-    protected float originalShapeX[];
-    protected float originalShapeY[];
-    protected float rotatedShapeX[];
-    protected float rotatedShapeY[];
-    protected float rotationMatrix[][];
+    /**
+     * The coordinates for the shape if they would be rotated. The unrotated
+     * angle corresponds to the shape pointing to the right.
+     */
+    protected float originalShapeX[], originalShapeY[];
+    
+    protected float rotatedShapeX[], rotatedShapeY[];
+    private float rotationMatrix[][];
 
+    public MovingObject()
+    {
+                //Allocates the rotation matrix.
+        rotationMatrix = new float[2][];
+        rotationMatrix[0] = new float[2];
+        rotationMatrix[1] = new float[2];
+
+    }
+    
+    /**
+     * Increases the speed of the shape.
+     * @param acceleration The amount to increase the speed to.
+     */
     public void accelerate(float acceleration) {
         directionX = directionX * speed + acceleration * rotationMatrix[0][0];
         directionY = directionY * speed + acceleration * rotationMatrix[1][0];
@@ -36,6 +70,11 @@ public abstract class MovingObject implements IGraphicItem, IPhysicalItem {
         directionY /= speed;
     }
 
+    /**
+     * Adds a rotation speed to the object. (IE. the rotation speed
+     * will accelerate.
+     * @param degrees The amount that the rotation speed will accelerate.
+     */
     public void turn(double degrees) {
         rotationSpeed += (degrees / 180) * Math.PI;
     }
@@ -64,6 +103,9 @@ public abstract class MovingObject implements IGraphicItem, IPhysicalItem {
         graphics.translate((int) -x, (int) -y);
     }
 
+    /**
+     * Moves the shape by applying the turning speed and dx and dy.
+     */
     @Override
     public void move() {
 

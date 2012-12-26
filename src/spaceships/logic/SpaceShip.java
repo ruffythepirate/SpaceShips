@@ -14,10 +14,6 @@ import java.awt.Graphics;
 public class SpaceShip extends MovingObject {
 
     public SpaceShip() {
-        //Allocates the rotation matrix.
-        rotationMatrix = new float[2][];
-        rotationMatrix[0] = new float[2];
-        rotationMatrix[1] = new float[2];
 
         initializeOriginalShape();
 
@@ -25,7 +21,11 @@ public class SpaceShip extends MovingObject {
 
     }
 
-
+//    public Bullet createBullet()
+//    {
+//        Bullet bullet = new Bullet(startX, startY, x, speed);
+//    }
+    
     private void initializeOriginalShape() {
         originalShapeY = new float[3];
         originalShapeY[0] = 0.0f;
