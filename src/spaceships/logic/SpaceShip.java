@@ -6,6 +6,7 @@ package spaceships.logic;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import spaceships.logic.Bullet;
 
 /**
  *
@@ -13,6 +14,10 @@ import java.awt.Graphics;
  */
 public class SpaceShip extends MovingObject {
 
+    private int reloadIterationsLeft = 0;    
+    private boolean reloaded = true;
+    private int reloadIterationsRequired = 20;
+    
     public SpaceShip() {
 
         initializeOriginalShape();
@@ -20,11 +25,34 @@ public class SpaceShip extends MovingObject {
         x = y = 50;
 
     }
+    
+    public boolean isRealoaded()
+    {
+        return reloaded;
+    }
 
-//    public Bullet createBullet()
-//    {
-//        Bullet bullet = new Bullet(startX, startY, x, speed);
-//    }
+    public Bullet createBullet()
+    {
+        Bullet bullet = new Bullet(x + rotatedShapeX[0], 
+                y + (int)rotatedShapeY[0], (float)this.turnAngle, 5.0f);
+        reloaded = false;
+        reloadIterationsLeft = reloadIterationsRequired;
+        
+        return bullet;
+    }
+
+    @Override
+    public void move() {
+        super.move();
+        if(reloadIterationsLeft > 0) {
+            --reloadIterationsLeft;
+            if(reloadIterationsLeft == 0) {
+                reloaded = true;
+            }
+        }
+    }
+    
+    
     
     private void initializeOriginalShape() {
         originalShapeY = new float[3];

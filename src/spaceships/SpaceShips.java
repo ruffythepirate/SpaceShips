@@ -5,6 +5,8 @@
 package spaceships;
 
 import java.awt.event.KeyEvent;
+import java.util.LinkedList;
+import java.util.List;
 import spaceships.logic.*;
 import spaceships.view.SpaceShipPanel;
 import spaceships.view.SpaceShipsGameContainer;
@@ -15,27 +17,38 @@ import spaceships.view.SpaceShipsGameContainer;
  */
 public class SpaceShips implements Runnable {
 
+    private static SpaceShips s_Instance;
+    
     private Thread mainGameThread;
     private boolean gameIsRunning = true;
     GraphicsWorld graphicsWorld;
     PhysicalWorld physicalWorld;
     ControlManager controlManager;
     SpaceShipPanel gamePanel;
+    long framePeriod = 20;
+    //World objects.
     SpaceShip spaceShip;
     Astroid astroid;
-    long framePeriod = 20;
+    List<Bullet> bullets;
 
-    public SpaceShips() {
-
+    public static SpaceShips getInstance() {
+        if(s_Instance == null) {
+            s_Instance = new SpaceShips();
+        }
+        return s_Instance;
+    }
+    
+    private SpaceShips() {
+        bullets = new LinkedList<Bullet>();
         controlManager = new ControlManager();
         initializeControls();
 
         graphicsWorld = new GraphicsWorld();
 
-        
+
         spaceShip = new SpaceShip();
         astroid = Astroid.createRandomAstroid(15, 15.0f, 2.0f, 0.05f);
-        
+
         graphicsWorld.addGraphicItem(spaceShip);
         graphicsWorld.addGraphicItem(astroid);
 
@@ -50,7 +63,7 @@ public class SpaceShips implements Runnable {
     public static void main(String[] args) {
         // TODO code application logic here
 
-        SpaceShips spaceShips = new SpaceShips();
+        SpaceShips spaceShips = getInstance();
 
         spaceShips.start();
     }
@@ -65,7 +78,6 @@ public class SpaceShips implements Runnable {
         container.initializeWorld(graphicsWorld);
 
         java.awt.EventQueue.invokeLater(new Runnable() {
-
             public void run() {
                 container.setVisible(true);
             }
@@ -73,6 +85,11 @@ public class SpaceShips implements Runnable {
 
         mainGameThread.start();
 
+    }
+
+    public void removeBulletFromWorld(Bullet bulletToRemove) {
+        graphicsWorld.removeGraphicItem(bulletToRemove);
+        bullets.remove(bulletToRemove);
     }
 
     @Override
@@ -88,6 +105,11 @@ public class SpaceShips implements Runnable {
 
             astroid.move();
             spaceShip.move();
+            for (Bullet bullet : this.bullets) {
+                bullet.move();
+                bullet.wrapPosition(gamePanel.getWidth(), gamePanel.getHeight());
+            }
+
             spaceShip.wrapPosition(gamePanel.getWidth(), gamePanel.getHeight());
             astroid.wrapPosition(gamePanel.getWidth(), gamePanel.getHeight());
             spaceShip.applyFriction(0.95f);
@@ -129,7 +151,11 @@ public class SpaceShips implements Runnable {
                     break;
                 //Fire a bullet.
                 case 110:
-                    //spaceShip.createBullet();
+                    if (spaceShip.isRealoaded()) {
+                        Bullet newBullet = spaceShip.createBullet();
+                        this.bullets.add(newBullet);
+                        graphicsWorld.addGraphicItem(newBullet);
+                    }
                     break;
             }
         }
@@ -139,6 +165,6 @@ public class SpaceShips implements Runnable {
         controlManager.addKeyCommand(KeyEvent.VK_UP, 100);
         controlManager.addKeyCommand(KeyEvent.VK_LEFT, 101);
         controlManager.addKeyCommand(KeyEvent.VK_RIGHT, 102);
-        controlManager.addKeyCommand(KeyEvent.VK_SPACE, 103);
+        controlManager.addKeyCommand(KeyEvent.VK_SPACE, 110);
     }
 }
