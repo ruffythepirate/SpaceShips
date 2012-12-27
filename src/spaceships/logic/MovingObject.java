@@ -162,7 +162,10 @@ public abstract class MovingObject implements IGraphicItem, IPhysicalItem {
         //If it is a odd number - the point is contained, otherwise it is not.        
         //There is an assumed orientation of the lines, they are built clock-wise.
         int numberOfIntersectedLines = 0;
-
+        
+        //We place the coordinate in our local coordinate system.
+        x -= this.x;
+        y -= this.y;
         for (int i = 0; i < rotatedShapeX.length - 1; i++) {
             boolean pointCutLineFromRight = checkPointToTheRightOfLine(x, y,
                     rotatedShapeX[i], rotatedShapeY[i],
@@ -179,6 +182,18 @@ public abstract class MovingObject implements IGraphicItem, IPhysicalItem {
         }
 
         return numberOfIntersectedLines % 2 == 1;
+    }
+    
+    /**
+     * Checks if the given point is close enough to the shape to might be able to intersect.
+     * @param x The x coordinate of the point.
+     * @param y The y coordinate of the point.
+     * @return True if the point might intersect, otherwise false.
+     */
+    public boolean pointMightBeContained(float x, float y) {
+        float xDiff = x - this.x;
+        float yDiff = y - this.y;
+        return Math.abs(xDiff) + Math.abs(yDiff) < 2* this.objectRadius;
     }
 
     /**

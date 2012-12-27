@@ -11,9 +11,6 @@ import spaceships.SpaceShips;
  * @author johancarlsson
  */
 public class Bullet extends MovingObject implements IGraphicItem {
-
-    
-    
     int stepsLeftInLife = 70;
     
     /**
@@ -39,11 +36,27 @@ public class Bullet extends MovingObject implements IGraphicItem {
         //The bullet has been spent, it should now be removed from the physical world.
         if(stepsLeftInLife <= 0)
         {
-            SpaceShips.getInstance().removeBulletFromWorld(this);
+             SpaceShips.getInstance().removeBulletFromWorld(this);
         }
     }
 
-    
+    /**
+     * Checks if the bullet collides with the given object.
+     * @param otherObject
+     * @return 
+     */
+    public boolean doesCollide(MovingObject otherObject) {
+        if(otherObject.pointMightBeContained(x, y)) {
+            boolean pointIsInside = otherObject.shapeContainsPoint(x, y);
+            if(pointIsInside)
+            {
+                return true;
+            }
+            return otherObject.lineIntersectsShape(previousX, previousY,
+                    x, y);
+        }
+        return false;
+    }
     
     private void initializeShape() {
         originalShapeY = new float[3];

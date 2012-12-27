@@ -16,7 +16,7 @@ public class Astroid extends MovingObject {
         initializeOriginalShape(numberOfCorners, radius);
 
         x = y = 50;
-
+        initializeShapeRadius();
     }
     
     public static Astroid createRandomAstroid(int numberOfCorners, float radius, float maxSpeed, float maxRotation)

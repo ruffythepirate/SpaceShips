@@ -87,6 +87,10 @@ public class SpaceShips implements Runnable {
 
     }
 
+    public void removeAstroidFromWorld(Astroid astroidToRemove) {
+        graphicsWorld.removeGraphicItem(astroidToRemove);
+    }
+    
     public void removeBulletFromWorld(Bullet bulletToRemove) {
         graphicsWorld.removeGraphicItem(bulletToRemove);
         bullets.remove(bulletToRemove);
@@ -108,6 +112,12 @@ public class SpaceShips implements Runnable {
             for (Bullet bullet : this.bullets) {
                 bullet.move();
                 bullet.wrapPosition(gamePanel.getWidth(), gamePanel.getHeight());
+                
+                //Check if the object collided with the astroid.
+                boolean bulletHitAstroid = bullet.doesCollide(astroid);
+                if(bulletHitAstroid) {
+                    removeAstroidFromWorld(astroid);
+                }
             }
 
             spaceShip.wrapPosition(gamePanel.getWidth(), gamePanel.getHeight());

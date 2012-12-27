@@ -19,11 +19,11 @@ public class SpaceShip extends MovingObject {
     private int reloadIterationsRequired = 20;
     
     public SpaceShip() {
-
+        super();
         initializeOriginalShape();
 
         x = y = 50;
-
+        initializeShapeRadius();
     }
     
     public boolean isRealoaded()
