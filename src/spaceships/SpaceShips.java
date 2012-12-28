@@ -18,7 +18,6 @@ import spaceships.view.SpaceShipsGameContainer;
 public class SpaceShips implements Runnable {
 
     private static SpaceShips s_Instance;
-    
     private Thread mainGameThread;
     private boolean gameIsRunning = true;
     GraphicsWorld graphicsWorld;
@@ -28,16 +27,16 @@ public class SpaceShips implements Runnable {
     long framePeriod = 20;
     //World objects.
     SpaceShip spaceShip;
-    Astroid astroid;
+    List<Astroid> astroids;
     List<Bullet> bullets;
 
     public static SpaceShips getInstance() {
-        if(s_Instance == null) {
+        if (s_Instance == null) {
             s_Instance = new SpaceShips();
         }
         return s_Instance;
     }
-    
+
     private SpaceShips() {
         bullets = new LinkedList<Bullet>();
         controlManager = new ControlManager();
@@ -47,10 +46,10 @@ public class SpaceShips implements Runnable {
 
 
         spaceShip = new SpaceShip();
-        astroid = Astroid.createRandomAstroid(15, 15.0f, 2.0f, 0.05f);
+        astroids = new LinkedList<Astroid>();
+        addAstroidToWorld(Astroid.createRandomAstroid(5, 2.0f, 0.05f));
 
         graphicsWorld.addGraphicItem(spaceShip);
-        graphicsWorld.addGraphicItem(astroid);
 
         physicalWorld = new PhysicalWorld();
 
@@ -87,10 +86,15 @@ public class SpaceShips implements Runnable {
 
     }
 
+    public void addAstroidToWorld(Astroid astroidToAdd) {
+        graphicsWorld.addGraphicItem(astroidToAdd);
+        astroids.add(astroidToAdd);
+    }
+
     public void removeAstroidFromWorld(Astroid astroidToRemove) {
         graphicsWorld.removeGraphicItem(astroidToRemove);
     }
-    
+
     public void removeBulletFromWorld(Bullet bulletToRemove) {
         graphicsWorld.removeGraphicItem(bulletToRemove);
         bullets.remove(bulletToRemove);
@@ -106,23 +110,9 @@ public class SpaceShips implements Runnable {
             startTime = System.currentTimeMillis();
 
             doControls();
+            moveObjects();
+            doCollissionDetection();
 
-            astroid.move();
-            spaceShip.move();
-            for (Bullet bullet : this.bullets) {
-                bullet.move();
-                bullet.wrapPosition(gamePanel.getWidth(), gamePanel.getHeight());
-                
-                //Check if the object collided with the astroid.
-                boolean bulletHitAstroid = bullet.doesCollide(astroid);
-                if(bulletHitAstroid) {
-                    removeAstroidFromWorld(astroid);
-                }
-            }
-
-            spaceShip.wrapPosition(gamePanel.getWidth(), gamePanel.getHeight());
-            astroid.wrapPosition(gamePanel.getWidth(), gamePanel.getHeight());
-            spaceShip.applyFriction(0.95f);
             gamePanel.repaint();
 
             try {
@@ -176,5 +166,35 @@ public class SpaceShips implements Runnable {
         controlManager.addKeyCommand(KeyEvent.VK_LEFT, 101);
         controlManager.addKeyCommand(KeyEvent.VK_RIGHT, 102);
         controlManager.addKeyCommand(KeyEvent.VK_SPACE, 110);
+    }
+
+    private void moveObjects() {
+        for (Astroid astroid : astroids) {
+            astroid.move();
+            astroid.wrapPosition(gamePanel.getWidth(), gamePanel.getHeight());
+        }
+        spaceShip.move();
+        spaceShip.wrapPosition(gamePanel.getWidth(), gamePanel.getHeight());
+        spaceShip.applyFriction(0.95f);
+        for (Bullet bullet : this.bullets) {
+            bullet.move();
+            bullet.wrapPosition(gamePanel.getWidth(), gamePanel.getHeight());
+        }
+
+    }
+
+    private void doCollissionDetection() {
+        for (Bullet bullet : this.bullets) {
+            //Check if the object collided with the astroid.
+            for (Astroid astroid : astroids) {
+                boolean bulletHitAstroid = bullet.doesCollide(astroid);
+                if (bulletHitAstroid) {
+                    astroid.explodeAstroid(bullet);
+                    removeBulletFromWorld(bullet);
+                    bullet.getOwningShip().addScore(100);
+                    break;
+                }
+            }
+        }
     }
 }

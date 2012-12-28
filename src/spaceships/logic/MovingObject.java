@@ -59,6 +59,11 @@ public abstract class MovingObject implements IGraphicItem, IPhysicalItem {
 
     }
 
+    public void setPosition(float x, float y) {
+        this.x = x;
+        this.y = y;
+    }
+    
     /**
      * Increases the speed of the shape.
      *

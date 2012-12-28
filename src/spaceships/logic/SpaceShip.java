@@ -14,6 +14,10 @@ import spaceships.logic.Bullet;
  */
 public class SpaceShip extends MovingObject {
 
+    private SpaceShipTrail graphicEngineTrail;
+    
+    private int score = 0;
+    
     private int reloadIterationsLeft = 0;    
     private boolean reloaded = true;
     private int reloadIterationsRequired = 20;
@@ -22,9 +26,27 @@ public class SpaceShip extends MovingObject {
         super();
         initializeOriginalShape();
 
+        graphicEngineTrail = new SpaceShipTrail();
         x = y = 50;
         initializeShapeRadius();
     }
+
+    @Override
+    public void accelerate(float acceleration) {
+        super.accelerate(acceleration);
+        float engineX = getEngineX();
+        float engineY = getEngineY();
+        graphicEngineTrail.registerAccelerateAt(engineX, engineY);
+    }
+
+    @Override
+    public void paint(Graphics graphics) {
+        super.paint(graphics);
+        graphicEngineTrail.paint(graphics);
+    }
+    
+    
+    
     
     public boolean isRealoaded()
     {
@@ -34,7 +56,7 @@ public class SpaceShip extends MovingObject {
     public Bullet createBullet()
     {
         Bullet bullet = new Bullet(x + rotatedShapeX[0], 
-                y + (int)rotatedShapeY[0], (float)this.turnAngle, 5.0f);
+                y + (int)rotatedShapeY[0], (float)this.turnAngle, 5.0f, this);
         reloaded = false;
         reloadIterationsLeft = reloadIterationsRequired;
         
@@ -50,6 +72,7 @@ public class SpaceShip extends MovingObject {
                 reloaded = true;
             }
         }
+        graphicEngineTrail.update();
     }
     
     
@@ -61,7 +84,7 @@ public class SpaceShip extends MovingObject {
         originalShapeY[2] = -3.0f;
 
         originalShapeX = new float[3];
-        originalShapeX[0] = 9.0f;
+        originalShapeX[0] = 7.0f;
         originalShapeX[1] = -2.0f;
         originalShapeX[2] = -2.0f;
 
@@ -71,4 +94,27 @@ public class SpaceShip extends MovingObject {
         updateRotatedShape();
     }
 
+    private float getEngineX() {
+        return x + (rotatedShapeX[1] + rotatedShapeX[2]) / 2;
+    }
+
+    private float getEngineY() {
+        return y + (rotatedShapeY[1] + rotatedShapeY[2]) / 2;
+    }
+
+    /**
+     * @return the score
+     */
+    public int getScore() {
+        return score;
+    }
+
+    /**
+     * Adds points to the players score.
+     * @param scoreToAdd
+     * @return 
+     */
+    public void addScore(int scoreToAdd) {
+        score += scoreToAdd;
+    }
 }

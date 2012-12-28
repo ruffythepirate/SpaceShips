@@ -13,6 +13,8 @@ import spaceships.SpaceShips;
 public class Bullet extends MovingObject implements IGraphicItem {
     int stepsLeftInLife = 70;
     
+    private SpaceShip owningShip;
+    
     /**
      * Creates a new simple bulle tobject.
      * @param startX The coordinate where the bullet starts out from.
@@ -20,13 +22,14 @@ public class Bullet extends MovingObject implements IGraphicItem {
      * @param angle The direction that the bullet will fly in.
      * @param initialSpeed The initial speed of the bullet.
      */
-    public Bullet(float startX, float startY, float angle, float initialSpeed) {
+    public Bullet(float startX, float startY, float angle, float initialSpeed, SpaceShip owningShip) {
         this.x = startX;
         this.y = startY;
         this.turnAngle = angle;
         this.speed = initialSpeed;
         initializeShape();
         setDirectionToTurnAngle();
+        setOwningShip(owningShip);
     }
 
     @Override
@@ -74,5 +77,19 @@ public class Bullet extends MovingObject implements IGraphicItem {
         updateRotationMatrix();
         updateRotatedShape();
 
+    }
+
+    /**
+     * @return the owningShip
+     */
+    public SpaceShip getOwningShip() {
+        return owningShip;
+    }
+
+    /**
+     * @param owningShip the owningShip to set
+     */
+    public void setOwningShip(SpaceShip owningShip) {
+        this.owningShip = owningShip;
     }
 }
