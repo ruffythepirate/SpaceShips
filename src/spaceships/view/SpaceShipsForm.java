@@ -4,18 +4,21 @@
  */
 package spaceships.view;
 
+import spaceships.SpaceShips;
 import spaceships.logic.GraphicsWorld;
 
 /**
  *
  * @author johancarlsson
  */
-public class SpaceShipsGameContainer extends javax.swing.JFrame {
+public class SpaceShipsForm extends javax.swing.JFrame implements IInGameMenuContainer {
+
+    InGameMenuPanel m_InGameMenuPanel;
 
     /**
      * Creates new form SpaceShipsGameContainer
      */
-    public SpaceShipsGameContainer() {
+    public SpaceShipsForm() {
         initComponents();
     }
 
@@ -28,6 +31,7 @@ public class SpaceShipsGameContainer extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        m_MainLayeredPanel = new javax.swing.JLayeredPane();
         spaceShipPanel1 = new spaceships.view.SpaceShipPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -36,34 +40,51 @@ public class SpaceShipsGameContainer extends javax.swing.JFrame {
         spaceShipPanel1.setLayout(spaceShipPanel1Layout);
         spaceShipPanel1Layout.setHorizontalGroup(
             spaceShipPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 400, Short.MAX_VALUE)
+            .add(0, 360, Short.MAX_VALUE)
         );
         spaceShipPanel1Layout.setVerticalGroup(
             spaceShipPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 300, Short.MAX_VALUE)
+            .add(0, 330, Short.MAX_VALUE)
         );
+
+        spaceShipPanel1.setBounds(0, 0, 360, 330);
+        m_MainLayeredPanel.add(spaceShipPanel1, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, spaceShipPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .add(m_MainLayeredPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 355, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(spaceShipPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .add(m_MainLayeredPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    public void hideInGameMenu() {
+        InGameMenuPanel menuPanel = getInGameMenuPanel();
+        menuPanel.setVisible(false);
+
+    }
+
+    public void showInGameMenu() {
+        SpaceShips.getInstance().setPaused(true);
+        InGameMenuPanel menuPanel = getInGameMenuPanel();
+        menuPanel.setVisible(true);
+        menuPanel.requestFocus();
+    }
+
     public void initializeWorld(GraphicsWorld graphicsWorld) {
         spaceShipPanel1.setGraphicsWorld(graphicsWorld);
     }
-    
-    public SpaceShipPanel getSpaceShipPanel(){
+
+    public SpaceShipPanel getSpaceShipPanel() {
         return spaceShipPanel1;
     }
+
     /**
      * @param args the command line arguments
      */
@@ -85,13 +106,13 @@ public class SpaceShipsGameContainer extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(SpaceShipsGameContainer.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(SpaceShipsForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(SpaceShipsGameContainer.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(SpaceShipsForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(SpaceShipsGameContainer.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(SpaceShipsForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(SpaceShipsGameContainer.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(SpaceShipsForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
@@ -99,13 +120,26 @@ public class SpaceShipsGameContainer extends javax.swing.JFrame {
          * Create and display the form
          */
         java.awt.EventQueue.invokeLater(new Runnable() {
-
             public void run() {
-                new SpaceShipsGameContainer().setVisible(true);
+                new SpaceShipsForm().setVisible(true);
             }
         });
     }
+
+    private InGameMenuPanel getInGameMenuPanel() {
+        if (m_InGameMenuPanel == null) {
+            String[] options = {"Continue", "Quit"};
+            m_InGameMenuPanel = new InGameMenuPanel(options, this);
+            m_InGameMenuPanel.setSize(m_InGameMenuPanel.getPreferredSize());
+            m_InGameMenuPanel.setLocation((spaceShipPanel1.getWidth() - m_InGameMenuPanel.getWidth()) / 2,
+                    (spaceShipPanel1.getHeight() - m_InGameMenuPanel.getHeight()) / 2);
+            m_MainLayeredPanel.add(m_InGameMenuPanel, new Integer(1), 0);
+
+        }
+        return m_InGameMenuPanel;
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLayeredPane m_MainLayeredPanel;
     private spaceships.view.SpaceShipPanel spaceShipPanel1;
     // End of variables declaration//GEN-END:variables
 }
