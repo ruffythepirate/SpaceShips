@@ -17,8 +17,8 @@ class TrailDebri {
     private static Color endColor = Color.BLACK;
     private int x, y;
     private float deteriorationFactor = 0.012f;
-    
-    final int radius = 2;
+    private float startRadius = 2.0f;
+    private float endRadius = 15.0f;
     
     int lifeIterations;
     final int lifeIterationLimit;
@@ -42,6 +42,7 @@ class TrailDebri {
         
         Color currentColor = getColor(lifeIterations * deteriorationFactor);
         graphics.setColor(currentColor);
+        int radius =(int) ( startRadius + (endRadius - startRadius) * (lifeIterations / (float) lifeIterationLimit));
         graphics.drawOval(x, y, radius, radius);
     }
     

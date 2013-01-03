@@ -113,33 +113,34 @@ public class SpaceShips implements Runnable {
             startTime = System.currentTimeMillis();
 
 
-       if (!isPaused()) {
-            doControls();
-        
-            moveObjects();
-            doCollissionDetection();
+            if (!isPaused()) {
+                doControls();
 
-            gamePanel.repaint();
+                moveObjects();
+                doCollissionDetection();
+
+                gamePanel.repaint();
 
 
-            try {
-                endTime = System.currentTimeMillis();
-                // don’t sleep for a negative amount of time
-                if (framePeriod - (endTime - startTime) > 0) {
-                    Thread.sleep(framePeriod - (endTime - startTime));
+                try {
+                    endTime = System.currentTimeMillis();
+                    // don’t sleep for a negative amount of time
+                    if (framePeriod - (endTime - startTime) > 0) {
+                        Thread.sleep(framePeriod - (endTime - startTime));
+                    }
+                } catch (InterruptedException ex) {
                 }
-            } catch (InterruptedException ex) {
             }
-        }
 
+        }
     }
-    
-    public void closeInGameMenu(){
+
+    public void closeInGameMenu() {
         m_MainForm.hideInGameMenu();
         setPaused(false);
         m_MainForm.requestFocus();
     }
-    
+
     /**
      * Quits the application.
      */
