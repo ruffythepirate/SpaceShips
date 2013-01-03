@@ -13,6 +13,13 @@ import java.awt.Graphics;
  */
 public abstract class MovingObject implements IGraphicItem, IPhysicalItem {
 
+    private static boolean checkIntersectOneDimension(float line1StartX, float line1EndX, float line2StartX, float line2EndX) {
+        float line1MaxX = line1StartX > line1EndX ? line1StartX : line1EndX;
+        float line1MinX = line1StartX < line1EndX ? line1StartX : line1EndX;
+        float line2MaxX = line2StartX > line2EndX ? line2StartX : line2EndX;
+        float line2MinX = line2StartX < line2EndX ? line2StartX : line2EndX;
+        return line1MinX <= line2MaxX && line1MaxX >= line2MinX;
+    }
     /**
      * The angle that the shape is currently rotated to.
      */
@@ -63,7 +70,7 @@ public abstract class MovingObject implements IGraphicItem, IPhysicalItem {
         this.x = x;
         this.y = y;
     }
-    
+
     /**
      * Increases the speed of the shape.
      *
@@ -167,7 +174,7 @@ public abstract class MovingObject implements IGraphicItem, IPhysicalItem {
         //If it is a odd number - the point is contained, otherwise it is not.        
         //There is an assumed orientation of the lines, they are built clock-wise.
         int numberOfIntersectedLines = 0;
-        
+
         //We place the coordinate in our local coordinate system.
         x -= this.x;
         y -= this.y;
@@ -188,9 +195,11 @@ public abstract class MovingObject implements IGraphicItem, IPhysicalItem {
 
         return numberOfIntersectedLines % 2 == 1;
     }
-    
+
     /**
-     * Checks if the given point is close enough to the shape to might be able to intersect.
+     * Checks if the given point is close enough to the shape to might be able
+     * to intersect.
+     *
      * @param x The x coordinate of the point.
      * @param y The y coordinate of the point.
      * @return True if the point might intersect, otherwise false.
@@ -198,11 +207,12 @@ public abstract class MovingObject implements IGraphicItem, IPhysicalItem {
     public boolean pointMightBeContained(float x, float y) {
         float xDiff = x - this.x;
         float yDiff = y - this.y;
-        return Math.abs(xDiff) + Math.abs(yDiff) < 2* this.objectRadius;
+        return Math.abs(xDiff) + Math.abs(yDiff) < 2 * this.objectRadius;
     }
 
     /**
      * Checks if the given line intersects this shape or not.
+     *
      * @param startX The start coordinate for the line.
      * @param startY The start coordinate for the line.
      * @param endX The end coordinate for the line.
@@ -211,38 +221,48 @@ public abstract class MovingObject implements IGraphicItem, IPhysicalItem {
      */
     public boolean lineIntersectsShape(float startX, float startY, float endX, float endY) {
         for (int i = 0; i < rotatedShapeX.length - 1; i++) {
-            boolean linesIntersect = checkLineIntersects(startX, startY, endX, endY, rotatedShapeX[i], rotatedShapeY[i], rotatedShapeX[i + 1], rotatedShapeY[i + 1]);
+            boolean linesIntersect = checkLinesIntersect(startX, startY, endX, endY, rotatedShapeX[i], rotatedShapeY[i], rotatedShapeX[i + 1], rotatedShapeY[i + 1]);
             if (linesIntersect) {
                 return true;
             }
         }
-        boolean linesIntersect = checkLineIntersects(startX, startY, endX, endY, rotatedShapeX[rotatedShapeY.length - 1], rotatedShapeY[rotatedShapeY.length - 1], rotatedShapeX[0], rotatedShapeY[0]);
+        boolean linesIntersect = checkLinesIntersect(startX, startY, endX, endY, rotatedShapeX[rotatedShapeY.length - 1], rotatedShapeY[rotatedShapeY.length - 1], rotatedShapeX[0], rotatedShapeY[0]);
         if (linesIntersect) {
             return true;
         }
         return false;
     }
 
-    public static boolean checkLineIntersects(float line1StartX, float line1StartY, float line1EndX, float line1EndY,
+    private static boolean checkLinesMightIntersect(float line1StartX, float line1StartY, float line1EndX, float line1EndY,
             float line2StartX, float line2StartY, float line2EndX, float line2EndY) {
-        float line1VectorX = line1EndX - line1StartX;
-        float line1VectorY = line1EndY - line1StartY;
-        float line2VectorX = line2EndX - line2StartX;
-        float line2VectorY = line2EndY - line2StartY;
-        float startVectorX = line1StartX - line2StartX;
-        float startVectorY = line1StartY - line2StartY;
-        float determinant = line2VectorY * line1VectorX - line1VectorY * line2VectorX;
-        //This means that the lines are parallell.
-        if(determinant == 0) {
-            return false;
+        return checkIntersectOneDimension(line1StartX, line1EndX, line2StartX, line2EndX)
+                && checkIntersectOneDimension(line1StartY, line1EndY, line2StartY, line2EndY);
+    }
+
+    public static boolean checkLinesIntersect(float line1StartX, float line1StartY, float line1EndX, float line1EndY,
+            float line2StartX, float line2StartY, float line2EndX, float line2EndY) {
+        boolean mightIntersect = checkLinesMightIntersect(line1StartX, line1StartY, line1EndX, line1EndY, line2StartX, line2StartY, line2EndX, line2EndY);
+        if (mightIntersect) {
+            float line1VectorX = line1EndX - line1StartX;
+            float line1VectorY = line1EndY - line1StartY;
+            float line2VectorX = line2EndX - line2StartX;
+            float line2VectorY = line2EndY - line2StartY;
+            float startVectorX = line1StartX - line2StartX;
+            float startVectorY = line1StartY - line2StartY;
+            float determinant = line2VectorY * line1VectorX - line1VectorY * line2VectorX;
+            //This means that the lines are parallell.
+            if (determinant == 0) {
+                return false;
+            }
+            float factor1 = line2VectorX * (startVectorY) - line2VectorY * (startVectorX);
+            factor1 /= determinant;
+            float factor2 = line1VectorX * (startVectorY) - line1VectorY * (startVectorX);
+            factor2 /= determinant;
+
+            return factor1 >= 0 && factor1 < 1.0f
+                    && factor2 >= 0 && factor2 < 1.0f;
         }
-        float factor1  =  line2VectorX * (startVectorY) - line2VectorY*(startVectorX);
-        factor1 /= determinant;
-        float factor2 = line1VectorX*(startVectorY) - line1VectorY * (startVectorX);
-        factor2 /= determinant;
-        
-        return factor1 >= 0 && factor1 < 1.0f
-            && factor2 >= 0 && factor2 < 1.0f;
+        return false;
     }
 
     private static boolean checkPointToTheRightOfLine(float pointX, float pointY,
@@ -289,14 +309,38 @@ public abstract class MovingObject implements IGraphicItem, IPhysicalItem {
         float centerDiffX = Math.abs(x - otherObject.x);
         float centerDiffY = Math.abs(y - otherObject.y);
 
-        if (centerDiffX < (objectRadius + otherObject.objectRadius)) {
+        if (centerDiffX < (objectRadius + otherObject.objectRadius)
+                && centerDiffY < objectRadius + otherObject.objectRadius) {
             return detailedIntersectCalculation(otherObject);
         }
         return false;
     }
 
     private boolean detailedIntersectCalculation(MovingObject otherObject) {
-        return true;
+        for (int i = 0; i < otherObject.rotatedShapeX.length - 1; i++) {
+            boolean intersects = lineIntersectsShape(
+                    (otherObject.x - this.x) + otherObject.rotatedShapeX[i],
+                    (otherObject.y - this.y) + otherObject.rotatedShapeY[i],
+                    (otherObject.x - this.x) + otherObject.rotatedShapeX[i + 1],
+                    (otherObject.y - this.y) + otherObject.rotatedShapeY[i + 1]);
+            if (intersects) {
+                return true;
+            }
+        }
+        int lastArrayIndex = rotatedShapeX.length - 1;
+        boolean intersects = lineIntersectsShape(
+                (otherObject.x - this.x) + otherObject.rotatedShapeX[lastArrayIndex],
+                (otherObject.y - this.y) + otherObject.rotatedShapeY[lastArrayIndex],
+                (otherObject.x - this.x) + otherObject.rotatedShapeX[0], 
+                (otherObject.y - this.y) + otherObject.rotatedShapeY[0]);
+        if (intersects) {
+            return true;
+        }
+
+        return shapeContainsPoint( (otherObject.x - this.x) + otherObject.rotatedShapeX[0], 
+                                    (otherObject.y - this.y) +  otherObject.rotatedShapeY[0])
+                || otherObject.shapeContainsPoint((this.x - otherObject.x) + rotatedShapeX[0], 
+                            (this.y - otherObject.y) + rotatedShapeY[0]);
     }
 
     @Override

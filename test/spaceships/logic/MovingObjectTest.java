@@ -94,8 +94,32 @@ public class MovingObjectTest {
 
     @Test
     public void testIntersects() {
-    }
+    
+        float[] shape1X = {0, 1, 1};
+        float[] shape1Y = {0, 1, 0};    
+        CustomShape customShape1 = new CustomShape(0, 0, shape1X, shape1Y);
 
+        float[] shape2X = {0,      1, 0.5f};
+        float[] shape2Y = {0.1f, 1.1f, 0.5f};    
+        CustomShape customShape2 = new CustomShape(0, 0, shape2X, shape2Y);
+        
+        assertTrue(customShape1.intersects(customShape2));
+        assertTrue(customShape2.intersects(customShape1));
+    }
+    
+    public void testIntersects2()
+    {
+        float[] shape1X = {0, 1, 1};
+        float[] shape1Y = {0, 1, 0};    
+        CustomShape customShape1 = new CustomShape(0, 0, shape1X, shape1Y);
+
+        float[] shape2X = {0, 1, 0};
+        float[] shape2Y = {0.1f, 1.1f, 1.1f};    
+        CustomShape customShape2 = new CustomShape(0, 0, shape2X, shape2Y);
+        
+        assertFalse(customShape1.intersects(customShape2));
+        assertFalse(customShape2.intersects(customShape1));
+    }
     @Test
     public void testApplyFriction() {
     }

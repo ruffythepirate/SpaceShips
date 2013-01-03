@@ -5,6 +5,8 @@
 package spaceships;
 
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import spaceships.logic.*;
@@ -21,6 +23,7 @@ public class SpaceShips implements Runnable {
     private SpaceShipsForm m_MainForm;
     private Thread mainGameThread;
     private boolean gameIsRunning = true;
+    private boolean gameOver = false;
     GraphicsWorld graphicsWorld;
     PhysicalWorld physicalWorld;
     ControlManager controlManager;
@@ -30,6 +33,7 @@ public class SpaceShips implements Runnable {
     SpaceShip spaceShip;
     List<Astroid> astroids;
     List<Bullet> bullets;
+    List<Bullet> bulletsToRemove;
     private boolean m_Paused;
 
     public static SpaceShips getInstance() {
@@ -40,7 +44,9 @@ public class SpaceShips implements Runnable {
     }
 
     private SpaceShips() {
-        bullets = new LinkedList<Bullet>();
+        bullets = Collections.synchronizedList(new ArrayList<Bullet>());
+        bulletsToRemove = new ArrayList<Bullet>();
+        astroids = Collections.synchronizedList(new ArrayList<Astroid>());
         controlManager = new ControlManager();
         initializeControls();
 
@@ -48,8 +54,6 @@ public class SpaceShips implements Runnable {
 
 
         spaceShip = new SpaceShip();
-        astroids = new LinkedList<Astroid>();
-        addAstroidToWorld(Astroid.createRandomAstroid(5, 2.0f, 0.05f));
 
         graphicsWorld.addGraphicItem(spaceShip);
 
@@ -77,6 +81,12 @@ public class SpaceShips implements Runnable {
         gamePanel.addKeyListener(controlManager);
         m_MainForm.addKeyListener(controlManager);
         m_MainForm.initializeWorld(graphicsWorld);
+
+        addAstroidToWorld(Astroid.createRandomAstroid(gamePanel.getWidth() / 2,
+                gamePanel.getHeight() / 2,
+                5,
+                2.0f,
+                0.05f));
 
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -221,7 +231,15 @@ public class SpaceShips implements Runnable {
         for (Bullet bullet : this.bullets) {
             bullet.move();
             bullet.wrapPosition(gamePanel.getWidth(), gamePanel.getHeight());
+            if (!bullet.isAlive()) {
+                bulletsToRemove.add(bullet);
+            }
         }
+
+        for (Bullet bulletToRemove : bulletsToRemove) {
+            removeBulletFromWorld(bulletToRemove);
+        }
+        bulletsToRemove.clear();
 
     }
 
@@ -232,10 +250,23 @@ public class SpaceShips implements Runnable {
                 boolean bulletHitAstroid = bullet.doesCollide(astroid);
                 if (bulletHitAstroid) {
                     astroid.explodeAstroid(bullet);
-                    removeBulletFromWorld(bullet);
+                    bullet.setAlive(false);
                     bullet.getOwningShip().addScore(100);
                     break;
                 }
+            }
+        }
+
+        for (Astroid astroid : astroids) {
+            boolean shipHitAstroid = spaceShip.intersects(astroid);
+            if (shipHitAstroid) {
+                //Explode ship.
+                graphicsWorld.removeGraphicItem(spaceShip);
+                gamePanel.setGameOver(true);
+                //Do game over if single player..
+
+                // Respawn ship if multiplayer.
+                break;
             }
         }
     }

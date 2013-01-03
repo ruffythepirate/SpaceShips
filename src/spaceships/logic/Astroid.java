@@ -14,42 +14,43 @@ public class Astroid extends MovingObject {
 
     private int astroidLevel;
     
-    public static Astroid createAstroid(int astroidLevel) {
+    public static Astroid createAstroid(float x, float y, int astroidLevel) {
         Astroid returnedAstroid = null;
         switch(astroidLevel) {
             case 1:
-                returnedAstroid = new Astroid(1, 5, 5.0f);
+                returnedAstroid = new Astroid(x, y, 1, 5, 5.0f);
                 break;
             case 2:
-                returnedAstroid = new Astroid(2, 7, 7.0f);
+                returnedAstroid = new Astroid(x, y, 2, 7, 7.0f);
                 break;
             case 3: 
-                returnedAstroid = new Astroid(3, 9, 9.0f);
+                returnedAstroid = new Astroid(x, y, 3, 9, 9.0f);
                 break;
             case 4:
-                returnedAstroid = new Astroid(4, 11, 11.0f);
+                returnedAstroid = new Astroid(x, y, 4, 11, 11.0f);
                 break;
             case 5:
-                returnedAstroid = new Astroid(5, 13, 13.0f);
+                returnedAstroid = new Astroid(x, y, 5, 13, 13.0f);
                 break;
             default:
         }
         return returnedAstroid;
     }
     
-    private Astroid(int astroidLevel, int numberOfCorners, float radius) {
+    private Astroid(float x, float y, int astroidLevel, int numberOfCorners, float radius) {
         super();
 
         this.astroidLevel = astroidLevel;
         initializeOriginalShape(numberOfCorners, radius);
 
-        x = y = 50;
+        this.x = x;
+        this.y = y;
         initializeShapeRadius();
     }
     
-    public static Astroid createRandomAstroid(int astroidLevel, float maxSpeed, float maxRotation)
+    public static Astroid createRandomAstroid(float x, float y, int astroidLevel, float maxSpeed, float maxRotation)
     {
-        Astroid astroid = createAstroid(astroidLevel);
+        Astroid astroid = createAstroid(x, y, astroidLevel);
         astroid.setSpeedAndDirection((float) Math.random() * maxSpeed, (float)(Math.PI * 2 * Math.random()));
         
         astroid.setRotation((float)Math.random() * maxRotation);
@@ -61,7 +62,7 @@ public class Astroid extends MovingObject {
             int newAstroidLevel = astroidLevel - 1;
             for(int i = 0; i < 2; i++) 
             {
-                Astroid firstAstroid = createRandomAstroid(newAstroidLevel, 2.0f, 1.0f);
+                Astroid firstAstroid = createRandomAstroid(x, y, newAstroidLevel, 2.0f, 1.0f);
                 firstAstroid.setPosition(x, y);
                 SpaceShips.getInstance().addAstroidToWorld(firstAstroid);
             }

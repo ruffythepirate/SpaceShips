@@ -27,5 +27,6 @@ public class CustomShape extends MovingObject {
 
         updateRotationMatrix();
         updateRotatedShape();
+        initializeShapeRadius();
     }
 }

@@ -5,6 +5,7 @@
 package spaceships.logic;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -17,7 +18,7 @@ public class GraphicsWorld {
     
     public GraphicsWorld()
     {
-        allGraphicItems = new ArrayList<IGraphicItem>();
+        allGraphicItems = Collections.synchronizedList( new ArrayList<IGraphicItem>());
     }
     
     public List<IGraphicItem> getGraphicItems(){

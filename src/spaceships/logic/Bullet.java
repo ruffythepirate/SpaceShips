@@ -11,12 +11,14 @@ import spaceships.SpaceShips;
  * @author johancarlsson
  */
 public class Bullet extends MovingObject implements IGraphicItem {
+
     int stepsLeftInLife = 70;
-    
+    private boolean alive = true;
     private SpaceShip owningShip;
-    
+
     /**
      * Creates a new simple bulle tobject.
+     *
      * @param startX The coordinate where the bullet starts out from.
      * @param startY The coordinate where the bullet starts out from.
      * @param angle The direction that the bullet will fly in.
@@ -34,25 +36,26 @@ public class Bullet extends MovingObject implements IGraphicItem {
 
     @Override
     public void move() {
-        super.move();
-        stepsLeftInLife--;
-        //The bullet has been spent, it should now be removed from the physical world.
-        if(stepsLeftInLife <= 0)
-        {
-             SpaceShips.getInstance().removeBulletFromWorld(this);
+        if (isAlive()) {
+            super.move();
+            stepsLeftInLife--;
+            //The bullet has been spent, it should now be removed from the physical world.
+            if (stepsLeftInLife <= 0) {
+                setAlive(false);
+            }
         }
     }
 
     /**
      * Checks if the bullet collides with the given object.
+     *
      * @param otherObject
-     * @return 
+     * @return
      */
     public boolean doesCollide(MovingObject otherObject) {
-        if(otherObject.pointMightBeContained(x, y)) {
+        if (otherObject.pointMightBeContained(x, y)) {
             boolean pointIsInside = otherObject.shapeContainsPoint(x, y);
-            if(pointIsInside)
-            {
+            if (pointIsInside) {
                 return true;
             }
             return otherObject.lineIntersectsShape(previousX, previousY,
@@ -60,7 +63,7 @@ public class Bullet extends MovingObject implements IGraphicItem {
         }
         return false;
     }
-    
+
     private void initializeShape() {
         originalShapeY = new float[3];
         originalShapeY[0] = 0.0f;
@@ -91,5 +94,19 @@ public class Bullet extends MovingObject implements IGraphicItem {
      */
     public void setOwningShip(SpaceShip owningShip) {
         this.owningShip = owningShip;
+    }
+
+    /**
+     * @return the alive
+     */
+    public boolean isAlive() {
+        return alive;
+    }
+
+    /**
+     * @param alive the alive to set
+     */
+    public void setAlive(boolean alive) {
+        this.alive = alive;
     }
 }
