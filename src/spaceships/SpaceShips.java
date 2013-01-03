@@ -9,7 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import spaceships.logic.*;
 import spaceships.view.SpaceShipPanel;
-import spaceships.view.SpaceShipsGameContainer;
+import spaceships.view.SpaceShipsForm;
 
 /**
  *
@@ -18,7 +18,7 @@ import spaceships.view.SpaceShipsGameContainer;
 public class SpaceShips implements Runnable {
 
     private static SpaceShips s_Instance;
-    
+    private SpaceShipsForm m_MainForm;
     private Thread mainGameThread;
     private boolean gameIsRunning = true;
     GraphicsWorld graphicsWorld;
@@ -30,14 +30,15 @@ public class SpaceShips implements Runnable {
     SpaceShip spaceShip;
     Astroid astroid;
     List<Bullet> bullets;
+    private boolean m_Paused;
 
     public static SpaceShips getInstance() {
-        if(s_Instance == null) {
+        if (s_Instance == null) {
             s_Instance = new SpaceShips();
         }
         return s_Instance;
     }
-    
+
     private SpaceShips() {
         bullets = new LinkedList<Bullet>();
         controlManager = new ControlManager();
@@ -71,15 +72,15 @@ public class SpaceShips implements Runnable {
     public void start() {
         mainGameThread = new Thread(this);
         gameIsRunning = true;
-        final SpaceShipsGameContainer container = new SpaceShipsGameContainer();
-        gamePanel = container.getSpaceShipPanel();
+        m_MainForm = new SpaceShipsForm();
+        gamePanel = m_MainForm.getSpaceShipPanel();
         gamePanel.addKeyListener(controlManager);
-        container.addKeyListener(controlManager);
-        container.initializeWorld(graphicsWorld);
+        m_MainForm.addKeyListener(controlManager);
+        m_MainForm.initializeWorld(graphicsWorld);
 
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                container.setVisible(true);
+                m_MainForm.setVisible(true);
             }
         });
 
@@ -99,21 +100,24 @@ public class SpaceShips implements Runnable {
 
         while (gameIsRunning) {
 
+
             startTime = System.currentTimeMillis();
 
-            doControls();
+            if (!isPaused()) {
+                doControls();
 
-            astroid.move();
-            spaceShip.move();
-            for (Bullet bullet : this.bullets) {
-                bullet.move();
-                bullet.wrapPosition(gamePanel.getWidth(), gamePanel.getHeight());
+                astroid.move();
+                spaceShip.move();
+                for (Bullet bullet : this.bullets) {
+                    bullet.move();
+                    bullet.wrapPosition(gamePanel.getWidth(), gamePanel.getHeight());
+                }
+
+                spaceShip.wrapPosition(gamePanel.getWidth(), gamePanel.getHeight());
+                astroid.wrapPosition(gamePanel.getWidth(), gamePanel.getHeight());
+                spaceShip.applyFriction(0.95f);
+                gamePanel.repaint();
             }
-
-            spaceShip.wrapPosition(gamePanel.getWidth(), gamePanel.getHeight());
-            astroid.wrapPosition(gamePanel.getWidth(), gamePanel.getHeight());
-            spaceShip.applyFriction(0.95f);
-            gamePanel.repaint();
 
             try {
                 endTime = System.currentTimeMillis();
@@ -125,6 +129,19 @@ public class SpaceShips implements Runnable {
             }
         }
 
+    }
+    
+    public void closeInGameMenu(){
+        m_MainForm.hideInGameMenu();
+        setPaused(false);
+        m_MainForm.requestFocus();
+    }
+    
+    /**
+     * Quits the application.
+     */
+    public void quit() {
+        System.exit(0);
     }
 
     private void doControls() {
@@ -157,6 +174,12 @@ public class SpaceShips implements Runnable {
                         graphicsWorld.addGraphicItem(newBullet);
                     }
                     break;
+                case 1000:
+                    setPaused(true);
+                    m_MainForm.showInGameMenu();
+                    command.setActive(false);
+                    break;
+
             }
         }
     }
@@ -166,5 +189,20 @@ public class SpaceShips implements Runnable {
         controlManager.addKeyCommand(KeyEvent.VK_LEFT, 101);
         controlManager.addKeyCommand(KeyEvent.VK_RIGHT, 102);
         controlManager.addKeyCommand(KeyEvent.VK_SPACE, 110);
+        controlManager.addKeyCommand(KeyEvent.VK_ESCAPE, 1000);
+    }
+
+    /**
+     * @return the m_Paused
+     */
+    public boolean isPaused() {
+        return m_Paused;
+    }
+
+    /**
+     * @param m_Paused the m_Paused to set
+     */
+    public void setPaused(boolean m_Paused) {
+        this.m_Paused = m_Paused;
     }
 }
