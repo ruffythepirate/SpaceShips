@@ -22,6 +22,8 @@ public class SpaceShip extends MovingObject {
     private boolean reloaded = true;
     private int reloadIterationsRequired = 20;
     
+    private boolean alive = true;
+    
     public SpaceShip() {
         super();
         initializeOriginalShape();
@@ -31,6 +33,14 @@ public class SpaceShip extends MovingObject {
         initializeShapeRadius();
     }
 
+    @Override
+    public Explosion createExplosion() {
+        Explosion explosion = new Explosion(x, y, directionX, directionY, 50);
+        return explosion;
+    }
+
+    
+    
     @Override
     public void accelerate(float acceleration) {
         super.accelerate(acceleration);
@@ -62,6 +72,7 @@ public class SpaceShip extends MovingObject {
         
         return bullet;
     }
+
 
     @Override
     public void move() {
@@ -116,5 +127,19 @@ public class SpaceShip extends MovingObject {
      */
     public void addScore(int scoreToAdd) {
         score += scoreToAdd;
+    }
+
+    /**
+     * @return the alive
+     */
+    public boolean isAlive() {
+        return alive;
+    }
+
+    /**
+     * @param alive the alive to set
+     */
+    public void setAlive(boolean alive) {
+        this.alive = alive;
     }
 }

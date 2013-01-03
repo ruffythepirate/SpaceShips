@@ -232,6 +232,17 @@ public abstract class MovingObject implements IGraphicItem, IPhysicalItem {
         }
         return false;
     }
+    
+        
+    /**
+     * Generates a explosion based on the space ships current position and movement.
+     * @return 
+     */
+    public Explosion createExplosion()
+    {
+        Explosion explosion = new Explosion(x, y, directionX, directionY, 15);
+        return explosion;
+    }
 
     private static boolean checkLinesMightIntersect(float line1StartX, float line1StartY, float line1EndX, float line1EndY,
             float line2StartX, float line2StartY, float line2EndX, float line2EndY) {

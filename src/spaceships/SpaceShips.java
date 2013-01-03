@@ -23,7 +23,6 @@ public class SpaceShips implements Runnable {
     private SpaceShipsForm m_MainForm;
     private Thread mainGameThread;
     private boolean gameIsRunning = true;
-    private boolean gameOver = false;
     GraphicsWorld graphicsWorld;
     PhysicalWorld physicalWorld;
     ControlManager controlManager;
@@ -34,6 +33,8 @@ public class SpaceShips implements Runnable {
     List<Astroid> astroids;
     List<Bullet> bullets;
     List<Bullet> bulletsToRemove;
+    List<Explosion> explosions;
+    List<Explosion> explosionsToRemove;
     private boolean m_Paused;
 
     public static SpaceShips getInstance() {
@@ -47,6 +48,9 @@ public class SpaceShips implements Runnable {
         bullets = Collections.synchronizedList(new ArrayList<Bullet>());
         bulletsToRemove = new ArrayList<Bullet>();
         astroids = Collections.synchronizedList(new ArrayList<Astroid>());
+        explosions = new ArrayList<Explosion>();
+        explosionsToRemove = new ArrayList<Explosion>();
+
         controlManager = new ControlManager();
         initializeControls();
 
@@ -221,13 +225,70 @@ public class SpaceShips implements Runnable {
     }
 
     private void moveObjects() {
+        moveAstroids();
+        moveSpaceShips();
+        moveExplosions();
+        moveBullets();
+    }
+
+    private void doCollissionDetection() {
+        doBulletCollissionDetection();
+        doSpaceShipCollissionDetection();
+    }
+
+    private void doBulletCollissionDetection() {
+        for (Bullet bullet : this.bullets) {
+            //Check if the object collided with the astroid.
+            for (Astroid astroid : astroids) {
+                boolean bulletHitAstroid = bullet.doesCollide(astroid);
+                if (bulletHitAstroid) {
+                    astroid.explodeAstroid(bullet);
+                    Explosion astroidExplosion = astroid.createExplosion();
+                    explosions.add(astroidExplosion);
+                    graphicsWorld.addGraphicItem(astroidExplosion);
+                    bullet.setAlive(false);
+                    bullet.getOwningShip().addScore(100);
+                    break;
+                }
+            }
+        }
+    }
+
+    private void doSpaceShipCollissionDetection() {
+        if (spaceShip.isAlive()) {
+            for (Astroid astroid : astroids) {
+                boolean shipHitAstroid = spaceShip.intersects(astroid);
+                if (shipHitAstroid) {
+                    Explosion shipExplosion = spaceShip.createExplosion();
+                    spaceShip.setAlive(false);
+                    explosions.add(shipExplosion);
+                    graphicsWorld.addGraphicItem(shipExplosion);
+                    //Explode ship.                
+                    graphicsWorld.removeGraphicItem(spaceShip);
+                    gamePanel.setGameOver(true);
+                    //Do game over if single player..
+
+                    // Respawn ship if multiplayer.
+                    break;
+                }
+            }
+        }
+    }
+
+    private void moveAstroids() {
         for (Astroid astroid : astroids) {
             astroid.move();
             astroid.wrapPosition(gamePanel.getWidth(), gamePanel.getHeight());
         }
+    }
+
+    private void moveSpaceShips() {
         spaceShip.move();
         spaceShip.wrapPosition(gamePanel.getWidth(), gamePanel.getHeight());
         spaceShip.applyFriction(0.95f);
+    }
+
+    private void moveBullets() {
         for (Bullet bullet : this.bullets) {
             bullet.move();
             bullet.wrapPosition(gamePanel.getWidth(), gamePanel.getHeight());
@@ -236,38 +297,24 @@ public class SpaceShips implements Runnable {
             }
         }
 
+
         for (Bullet bulletToRemove : bulletsToRemove) {
             removeBulletFromWorld(bulletToRemove);
         }
         bulletsToRemove.clear();
-
     }
 
-    private void doCollissionDetection() {
-        for (Bullet bullet : this.bullets) {
-            //Check if the object collided with the astroid.
-            for (Astroid astroid : astroids) {
-                boolean bulletHitAstroid = bullet.doesCollide(astroid);
-                if (bulletHitAstroid) {
-                    astroid.explodeAstroid(bullet);
-                    bullet.setAlive(false);
-                    bullet.getOwningShip().addScore(100);
-                    break;
-                }
+    private void moveExplosions() {
+        for (Explosion explosion : explosions) {
+            explosion.update();
+            if (!explosion.isAlive()) {
+                explosionsToRemove.add(explosion);
             }
         }
-
-        for (Astroid astroid : astroids) {
-            boolean shipHitAstroid = spaceShip.intersects(astroid);
-            if (shipHitAstroid) {
-                //Explode ship.
-                graphicsWorld.removeGraphicItem(spaceShip);
-                gamePanel.setGameOver(true);
-                //Do game over if single player..
-
-                // Respawn ship if multiplayer.
-                break;
-            }
+        for (Explosion explosionToRemove : explosionsToRemove) {
+            graphicsWorld.removeGraphicItem(explosionToRemove);
+            explosions.remove(explosionToRemove);
         }
+        explosionsToRemove.clear();
     }
 }
