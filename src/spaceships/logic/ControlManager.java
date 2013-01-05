@@ -6,6 +6,7 @@ package spaceships.logic;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,7 +20,7 @@ public class ControlManager implements KeyListener {
 
     public ControlManager() {
         commandDictionary = new HashMap<Integer, KeyCommand>();
-        allCommands = new LinkedList<KeyCommand>();
+        allCommands = new ArrayList<KeyCommand>();
     }
     Map<Integer, KeyCommand> commandDictionary;
     List<KeyCommand> allCommands;

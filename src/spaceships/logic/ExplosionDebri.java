@@ -21,7 +21,7 @@ public class ExplosionDebri {
     private static Color endColor = Color.BLACK;
     private Color currentColor = startColor;
     private int currentIteration = 0;
-    private int iterationLimit = 100;
+    private int iterationLimit = 60;
     private boolean alive = true;
 
     private ExplosionDebri(float x, float y, float speedX, float speedY,
@@ -37,7 +37,7 @@ public class ExplosionDebri {
     public static ExplosionDebri generateDebri(float x, float y, float baseSpeedX, float baseSpeedY) {
         float speedX = baseSpeedX + 6.0f * (float) (Math.random()-0.5);
         float speedY = baseSpeedY + 6.0f * (float) (Math.random() - 0.5);
-        ExplosionDebri debri = new ExplosionDebri(x, y, speedX, speedY, 3.0f, 9.0f);
+        ExplosionDebri debri = new ExplosionDebri(x, y, speedX, speedY, 1.0f, 3.0f);
         return debri;
     }
 

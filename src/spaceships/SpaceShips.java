@@ -109,6 +109,7 @@ public class SpaceShips implements Runnable {
 
     public void removeAstroidFromWorld(Astroid astroidToRemove) {
         graphicsWorld.removeGraphicItem(astroidToRemove);
+        astroids.remove(astroidToRemove);
     }
 
     public void removeBulletFromWorld(Bullet bulletToRemove) {
@@ -122,20 +123,12 @@ public class SpaceShips implements Runnable {
         long startTime;
 
         while (gameIsRunning) {
-
-
             startTime = System.currentTimeMillis();
-
-
             if (!isPaused()) {
                 doControls();
-
                 moveObjects();
                 doCollissionDetection();
-
                 gamePanel.repaint();
-
-
                 try {
                     endTime = System.currentTimeMillis();
                     // don’t sleep for a negative amount of time
@@ -145,7 +138,6 @@ public class SpaceShips implements Runnable {
                 } catch (InterruptedException ex) {
                 }
             }
-
         }
     }
 
@@ -197,7 +189,6 @@ public class SpaceShips implements Runnable {
                     m_MainForm.showInGameMenu();
                     command.setActive(false);
                     break;
-
             }
         }
     }

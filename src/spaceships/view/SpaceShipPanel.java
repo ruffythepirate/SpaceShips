@@ -39,12 +39,8 @@ public class SpaceShipPanel extends JPanel {
             grphcs.drawString("No Graphics World initialized!", 0, 0);
         }
         if(isGameOver()) {
-            String gameOverText = "GAME OVER";
-            Rectangle2D textBounds =  grphcs.getFontMetrics().getStringBounds(gameOverText, grphcs);
-            grphcs.drawString(gameOverText, (getWidth() - (int) textBounds.getWidth() ) / 2,
-                    (getHeight() - (int) textBounds.getHeight() ) / 2);
+            paintGameOverText(grphcs);
         }
-        
     }
 
     @Override
@@ -64,5 +60,13 @@ public class SpaceShipPanel extends JPanel {
      */
     public void setGameOver(boolean gameOver) {
         this.gameOver = gameOver;
+    }
+
+    private void paintGameOverText(Graphics grphcs) {
+        String gameOverText = "GAME OVER";
+        Rectangle2D textBounds =  grphcs.getFontMetrics().getStringBounds(gameOverText, grphcs);
+        grphcs.setColor(Color.LIGHT_GRAY);
+        grphcs.drawString(gameOverText, (getWidth() - (int) textBounds.getWidth() ) / 2,
+                (getHeight() - (int) textBounds.getHeight() ) / 2);
     }
 }
