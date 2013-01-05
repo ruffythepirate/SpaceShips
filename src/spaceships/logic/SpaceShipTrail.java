@@ -41,9 +41,9 @@ public class SpaceShipTrail implements IGraphicItem{
     }
     
     @Override
-    public void paint(Graphics graphics) {
+    public void paint(Graphics graphics, CameraSettings cameraSettings) {
         for(TrailDebri debri : allDebri) {
-            debri.paint(graphics);
+            debri.paint(graphics, cameraSettings);
         }
     }
     

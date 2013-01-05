@@ -4,8 +4,10 @@
  */
 package spaceships.view;
 
+import javax.swing.BoxLayout;
 import spaceships.SpaceShips;
 import spaceships.logic.GraphicsWorld;
+import spaceships.logic.PlayField;
 
 /**
  *
@@ -32,23 +34,18 @@ public class SpaceShipsForm extends javax.swing.JFrame implements IInGameMenuCon
     private void initComponents() {
 
         m_MainLayeredPanel = new javax.swing.JLayeredPane();
-        spaceShipPanel1 = new spaceships.view.SpaceShipPanel();
+        m_SpaceShipPanel = new spaceships.view.SpaceShipPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                formComponentResized(evt);
+            }
+        });
 
-        org.jdesktop.layout.GroupLayout spaceShipPanel1Layout = new org.jdesktop.layout.GroupLayout(spaceShipPanel1);
-        spaceShipPanel1.setLayout(spaceShipPanel1Layout);
-        spaceShipPanel1Layout.setHorizontalGroup(
-            spaceShipPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 360, Short.MAX_VALUE)
-        );
-        spaceShipPanel1Layout.setVerticalGroup(
-            spaceShipPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 330, Short.MAX_VALUE)
-        );
-
-        spaceShipPanel1.setBounds(0, 0, 360, 330);
-        m_MainLayeredPanel.add(spaceShipPanel1, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        m_SpaceShipPanel.setLayout(new javax.swing.BoxLayout(m_SpaceShipPanel, javax.swing.BoxLayout.LINE_AXIS));
+        m_SpaceShipPanel.setBounds(0, 0, 360, 330);
+        m_MainLayeredPanel.add(m_SpaceShipPanel, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -64,6 +61,14 @@ public class SpaceShipsForm extends javax.swing.JFrame implements IInGameMenuCon
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
+        // Resizes the panel to cover the form.
+        int width = getContentPane().getWidth();
+        int height = getContentPane().getHeight();
+        m_MainLayeredPanel.setSize(width, height);
+        m_SpaceShipPanel.setSize(width, height);
+    }//GEN-LAST:event_formComponentResized
+
     public void hideInGameMenu() {
         InGameMenuPanel menuPanel = getInGameMenuPanel();
         menuPanel.setVisible(false);
@@ -78,11 +83,13 @@ public class SpaceShipsForm extends javax.swing.JFrame implements IInGameMenuCon
     }
 
     public void initializeWorld(GraphicsWorld graphicsWorld) {
-        spaceShipPanel1.setGraphicsWorld(graphicsWorld);
+        PlayField currentPlayField = new PlayField(500, 500);
+        m_SpaceShipPanel.setGraphicsWorld(graphicsWorld);
+        m_SpaceShipPanel.setPlayField(currentPlayField);
     }
 
     public SpaceShipPanel getSpaceShipPanel() {
-        return spaceShipPanel1;
+        return m_SpaceShipPanel;
     }
 
     /**
@@ -131,8 +138,8 @@ public class SpaceShipsForm extends javax.swing.JFrame implements IInGameMenuCon
             String[] options = {"Continue", "Quit"};
             m_InGameMenuPanel = new InGameMenuPanel(options, this);
             m_InGameMenuPanel.setSize(m_InGameMenuPanel.getPreferredSize());
-            m_InGameMenuPanel.setLocation((spaceShipPanel1.getWidth() - m_InGameMenuPanel.getWidth()) / 2,
-                    (spaceShipPanel1.getHeight() - m_InGameMenuPanel.getHeight()) / 2);
+            m_InGameMenuPanel.setLocation((m_SpaceShipPanel.getWidth() - m_InGameMenuPanel.getWidth()) / 2,
+                    (m_SpaceShipPanel.getHeight() - m_InGameMenuPanel.getHeight()) / 2);
             m_MainLayeredPanel.add(m_InGameMenuPanel, new Integer(1), 0);
 
         }
@@ -140,6 +147,6 @@ public class SpaceShipsForm extends javax.swing.JFrame implements IInGameMenuCon
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLayeredPane m_MainLayeredPanel;
-    private spaceships.view.SpaceShipPanel spaceShipPanel1;
+    private spaceships.view.SpaceShipPanel m_SpaceShipPanel;
     // End of variables declaration//GEN-END:variables
 }

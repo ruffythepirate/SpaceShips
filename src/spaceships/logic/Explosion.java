@@ -26,14 +26,12 @@ public class Explosion implements IGraphicItem{
             allDebri.add(debri);
         }
     }
-     
-    
+        
     @Override
-    public void paint(Graphics graphics) {
+    public void paint(Graphics graphics, CameraSettings cameraSettings) {
         for(ExplosionDebri debri : allDebri) {
-            paintDebri( graphics, debri);
-        }
-    }
+            paintDebri( graphics,cameraSettings, debri);
+        }    }
     
     public void update()
     {
@@ -43,10 +41,13 @@ public class Explosion implements IGraphicItem{
         }
     }
 
-    private void paintDebri(Graphics graphics, ExplosionDebri debri) {
+    private void paintDebri(Graphics graphics, CameraSettings cameraSettings, ExplosionDebri debri) {
         graphics.setColor(debri.getCurrentColor());
-        int diameter = (int)( 2*debri.getCurrentRadius());
-        graphics.drawOval((int)debri.getX(), (int) debri.getY(), diameter, diameter);
+        int diameterX = (int)( 2*debri.getCurrentRadius() * cameraSettings.scaleX);
+        int diameterY = (int)( 2*debri.getCurrentRadius() * cameraSettings.scaleY);
+
+        graphics.drawOval((int)debri.getX()- cameraSettings.translationX,
+                (int) debri.getY() - cameraSettings.translationX, diameterX, diameterY);
     }
 
     /**
@@ -55,4 +56,6 @@ public class Explosion implements IGraphicItem{
     public boolean isAlive() {
         return alive;
     }
+
+
 }

@@ -50,13 +50,13 @@ public class SpaceShip extends MovingObject {
     }
 
     @Override
-    public void paint(Graphics graphics) {
-        super.paint(graphics);
-        graphicEngineTrail.paint(graphics);
+    public void paint(Graphics graphics, CameraSettings cameraSettings) {
+        super.paint(graphics, cameraSettings);
+        graphicEngineTrail.paint(graphics, cameraSettings);
     }
     
     
-    
+
     
     public boolean isRealoaded()
     {
@@ -86,7 +86,10 @@ public class SpaceShip extends MovingObject {
         graphicEngineTrail.update();
     }
     
-    
+    public Color getColor() 
+    {
+        return getShapeColor();
+    }
     
     private void initializeOriginalShape() {
         originalShapeY = new float[3];

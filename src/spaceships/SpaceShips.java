@@ -30,6 +30,7 @@ public class SpaceShips implements Runnable {
     long framePeriod = 20;
     //World objects.
     SpaceShip spaceShip;
+    List<SpaceShip> players;
     List<Astroid> astroids;
     List<Bullet> bullets;
     List<Bullet> bulletsToRemove;
@@ -45,6 +46,7 @@ public class SpaceShips implements Runnable {
     }
 
     private SpaceShips() {
+        players = new ArrayList<SpaceShip>();
         bullets = Collections.synchronizedList(new ArrayList<Bullet>());
         bulletsToRemove = new ArrayList<Bullet>();
         astroids = Collections.synchronizedList(new ArrayList<Astroid>());
@@ -58,6 +60,7 @@ public class SpaceShips implements Runnable {
 
 
         spaceShip = new SpaceShip();
+        players.add(spaceShip);
 
         graphicsWorld.addGraphicItem(spaceShip);
 
@@ -141,6 +144,11 @@ public class SpaceShips implements Runnable {
         }
     }
 
+    public List<SpaceShip> getPlayers()
+    {
+        return players;
+    }
+    
     public void closeInGameMenu() {
         m_MainForm.hideInGameMenu();
         setPaused(false);

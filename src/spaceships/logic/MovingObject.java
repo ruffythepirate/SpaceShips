@@ -13,6 +13,8 @@ import java.awt.Graphics;
  */
 public abstract class MovingObject implements IGraphicItem, IPhysicalItem {
 
+    private static CameraSettings s_DefaultCameraSettings = new CameraSettings();
+    
     private static boolean checkIntersectOneDimension(float line1StartX, float line1EndX, float line2StartX, float line2EndX) {
         float line1MaxX = line1StartX > line1EndX ? line1StartX : line1EndX;
         float line1MinX = line1StartX < line1EndX ? line1StartX : line1EndX;
@@ -48,7 +50,7 @@ public abstract class MovingObject implements IGraphicItem, IPhysicalItem {
     /**
      * The color that the shape is rendered in.
      */
-    protected Color spaceShipColor = Color.WHITE;
+    private Color shapeColor = Color.WHITE;
     /**
      * The coordinates for the shape if they would be rotated. The unrotated
      * angle corresponds to the shape pointing to the right.
@@ -108,23 +110,29 @@ public abstract class MovingObject implements IGraphicItem, IPhysicalItem {
             updateRotatedShape();
         }
     }
-
+    
     @Override
-    public void paint(Graphics graphics) {
-        graphics.translate((int) x, (int) y);
-        graphics.setColor(spaceShipColor);
+    public void paint(Graphics graphics, CameraSettings cameraSettings) {
+        cameraSettings = cameraSettings == null ? s_DefaultCameraSettings : cameraSettings;
+        int translationX = (int)x - cameraSettings.getTranslationX();
+        int translationY = (int)y - cameraSettings.getTranslationY();
+        float scaleX = cameraSettings.getScaleX();
+        float scaleY = cameraSettings.getScaleY();
+        graphics.translate( translationX, translationY );
+        graphics.setColor(getShapeColor());
+
         for (int i = 0; i < rotatedShapeX.length - 1; i++) {
-            graphics.drawLine((int) rotatedShapeX[i], (int) rotatedShapeY[i],
-                    (int) rotatedShapeX[i + 1], (int) rotatedShapeY[i + 1]);
+            graphics.drawLine((int) (rotatedShapeX[i] * scaleX), (int) (rotatedShapeY[i] * scaleY),
+                    (int) (rotatedShapeX[i + 1] * scaleX), (int) (rotatedShapeY[i + 1] * scaleY));
         }
 
-        graphics.drawLine((int) rotatedShapeX[rotatedShapeX.length - 1], (int) rotatedShapeY[rotatedShapeX.length - 1],
-                (int) rotatedShapeX[0], (int) rotatedShapeY[0]);
+        graphics.drawLine((int) (rotatedShapeX[rotatedShapeX.length - 1] * scaleX), (int) (rotatedShapeY[rotatedShapeX.length - 1]*scaleY),
+                (int) (rotatedShapeX[0]*scaleX), (int) (rotatedShapeY[0]*scaleY));
 
 
         graphics.translate((int) -x, (int) -y);
     }
-
+    
     /**
      * Moves the shape by applying the turning speed and dx and dy.
      */
@@ -389,5 +397,19 @@ public abstract class MovingObject implements IGraphicItem, IPhysicalItem {
             rotatedShapeY[i] = originalShapeX[i] * rotationMatrix[1][0]
                     + originalShapeY[i] * rotationMatrix[1][1];
         }
+    }
+
+    /**
+     * @return the shapeColor
+     */
+    protected Color getShapeColor() {
+        return shapeColor;
+    }
+
+    /**
+     * @param shapeColor the shapeColor to set
+     */
+    protected void setShapeColor(Color shapeColor) {
+        this.shapeColor = shapeColor;
     }
 }

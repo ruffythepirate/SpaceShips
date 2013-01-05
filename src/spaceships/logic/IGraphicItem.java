@@ -8,10 +8,10 @@ import java.awt.Graphics;
 
 /**
  *
- * @author johancarlsson
+ * @author ruffy
  */
 public interface IGraphicItem {
     
-    void paint(Graphics graphics);
-    
+    void paint(Graphics graphics, 
+            CameraSettings cameraSettings);
 }

@@ -16,6 +16,14 @@ class TrailDebri {
     private static Color startColor = Color.RED;
     private static Color endColor = Color.BLACK;
     private int x, y;
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
     private float deteriorationFactor = 0.012f;
     private float startRadius = 2.0f;
     private float endRadius = 15.0f;
@@ -38,12 +46,18 @@ class TrailDebri {
         return lifeIterations < lifeIterationLimit;
     }
     
-    public void paint(Graphics graphics) {
+    public void paint(Graphics graphics, CameraSettings cameraSettings) {
         
         Color currentColor = getColor(lifeIterations * deteriorationFactor);
         graphics.setColor(currentColor);
-        int radius =(int) ( startRadius + (endRadius - startRadius) * (lifeIterations / (float) lifeIterationLimit));
-        graphics.drawOval(x, y, radius, radius);
+        
+        float radius = startRadius + (endRadius - startRadius) * (lifeIterations / (float) lifeIterationLimit);
+        int diameterX = (int)( 2*radius * cameraSettings.scaleX);
+        int diameterY = (int)( 2*radius * cameraSettings.scaleY);
+
+        graphics.drawOval((int)getX()- cameraSettings.translationX,
+                (int) getY() - cameraSettings.translationX, diameterX, diameterY);
+        graphics.drawOval(x, y, diameterX, diameterY);
     }
     
     private static Color getColor(float deterioration) {
